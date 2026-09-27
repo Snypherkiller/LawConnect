@@ -1,0 +1,1151 @@
+/* =========================================================
+   HOW IT WORKS SECTION
+========================================================= */
+
+.how-section {
+  position: relative;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  padding:
+    125px 20px;
+
+  background:
+    radial-gradient(
+      circle at 18% 25%,
+      rgba(85, 94, 236, 0.13),
+      transparent 29%
+    ),
+    radial-gradient(
+      circle at 86% 70%,
+      rgba(43, 194, 216, 0.08),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #050914 0%,
+      #07101d 48%,
+      #06101c 100%
+    );
+}
+
+
+/* =========================================================
+   GRID BACKGROUND
+========================================================= */
+
+.how-grid-background {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  opacity: 0.23;
+
+  background-image:
+    linear-gradient(
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    46px 46px;
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent,
+      black 20%,
+      black 80%,
+      transparent
+    );
+}
+
+
+/* =========================================================
+   BACKGROUND GLOWS
+========================================================= */
+
+.how-glow {
+  position: absolute;
+
+  pointer-events: none;
+
+  border-radius: 50%;
+
+  filter: blur(15px);
+
+  animation:
+    howGlowFloat
+    16s
+    ease-in-out
+    infinite;
+}
+
+.how-glow-one {
+  width: 380px;
+  height: 380px;
+
+  top: -160px;
+  left: -150px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(102, 88, 230, 0.16),
+      transparent 70%
+    );
+}
+
+.how-glow-two {
+  width: 340px;
+  height: 340px;
+
+  right: -140px;
+  bottom: -150px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(39, 191, 213, 0.1),
+      transparent 70%
+    );
+
+  animation-delay:
+    -7s;
+}
+
+@keyframes howGlowFloat {
+  0%,
+  100% {
+    transform:
+      translate3d(0, 0, 0)
+      scale(1);
+  }
+
+  50% {
+    transform:
+      translate3d(12px, -10px, 0)
+      scale(1.04);
+  }
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.how-container {
+  position: relative;
+
+  z-index: 2;
+
+  width:
+    min(
+      1180px,
+      100%
+    );
+
+  margin:
+    0 auto;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.how-header {
+  width:
+    min(
+      760px,
+      100%
+    );
+
+  margin:
+    0 auto 65px;
+
+  text-align:
+    center;
+
+  animation:
+    howHeaderReveal
+    0.95s
+    var(--ease-smooth)
+    both;
+}
+
+@keyframes howHeaderReveal {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(22px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.how-eyebrow {
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  margin-bottom:
+    18px;
+
+  padding:
+    8px 13px;
+
+  border:
+    1px solid
+    rgba(108, 104, 245, 0.15);
+
+  border-radius:
+    999px;
+
+  color:
+    #8f91ff;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  font-size:
+    10px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    1.8px;
+}
+
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.how-header h2 {
+  margin: 0;
+
+  color:
+    var(--text-main);
+
+  font-size:
+    clamp(
+      38px,
+      5vw,
+      62px
+    );
+
+  font-weight:
+    800;
+
+  line-height:
+    1.06;
+
+  letter-spacing:
+    -2.6px;
+}
+
+.how-header h2 span {
+  background:
+    linear-gradient(
+      120deg,
+      #7184ff,
+      #a065ee,
+      #42cadd
+    );
+
+  background-clip:
+    text;
+
+  -webkit-background-clip:
+    text;
+
+  color:
+    transparent;
+
+  -webkit-text-fill-color:
+    transparent;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.how-header p {
+  width:
+    min(
+      650px,
+      100%
+    );
+
+  margin:
+    22px auto 0;
+
+  color:
+    var(--text-secondary);
+
+  font-size:
+    16px;
+
+  line-height:
+    1.8;
+}
+
+
+/* =========================================================
+   STEPS GRID
+========================================================= */
+
+.how-steps {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0, 1fr)
+    );
+
+  gap:
+    18px;
+}
+
+
+/* =========================================================
+   STEP CARD
+========================================================= */
+
+.how-step-card {
+  position: relative;
+
+  overflow: hidden;
+
+  min-height:
+    330px;
+
+  padding:
+    28px;
+
+  border:
+    1px solid
+    var(--border-subtle);
+
+  border-radius:
+    24px;
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(98, 89, 230, 0.09),
+      transparent 38%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(17, 29, 48, 0.92),
+      rgba(8, 17, 30, 0.96)
+    );
+
+  box-shadow:
+    0 20px 55px
+    rgba(0, 0, 0, 0.2);
+
+  animation:
+    howStepReveal
+    0.9s
+    var(--ease-smooth)
+    both;
+
+  transition:
+    transform
+    0.55s
+    var(--ease-smooth),
+    border-color
+    0.45s ease,
+    box-shadow
+    0.45s ease;
+}
+
+@keyframes howStepReveal {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+.how-step-card:hover {
+  transform:
+    translateY(-7px);
+
+  border-color:
+    rgba(114, 102, 239, 0.18);
+
+  box-shadow:
+    0 30px 75px
+    rgba(0, 0, 0, 0.3);
+}
+
+
+/* =========================================================
+   TOP ROW
+========================================================= */
+
+.how-step-top {
+  position: relative;
+
+  z-index: 2;
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  gap:
+    10px;
+}
+
+
+/* =========================================================
+   STEP NUMBER
+========================================================= */
+
+.how-step-number {
+  width:
+    46px;
+
+  height:
+    46px;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border:
+    1px solid
+    rgba(113, 107, 241, 0.16);
+
+  border-radius:
+    13px;
+
+  color:
+    #9a9cff;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(85, 93, 231, 0.13),
+      rgba(143, 85, 226, 0.1)
+    );
+
+  font-size:
+    11px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    0.6px;
+}
+
+
+/* =========================================================
+   STEP TAG
+========================================================= */
+
+.how-step-tag {
+  padding:
+    7px 9px;
+
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.055);
+
+  border-radius:
+    999px;
+
+  color:
+    #6f8096;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  font-size:
+    8px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    1px;
+
+  text-transform:
+    uppercase;
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.how-step-content {
+  position:
+    relative;
+
+  z-index:
+    2;
+
+  margin-top:
+    60px;
+}
+
+.how-step-content h3 {
+  margin: 0;
+
+  color:
+    #f3f7fc;
+
+  font-size:
+    21px;
+
+  font-weight:
+    750;
+
+  letter-spacing:
+    -0.5px;
+}
+
+.how-step-content p {
+  margin-top:
+    14px;
+
+  color:
+    #7f90a6;
+
+  font-size:
+    13px;
+
+  line-height:
+    1.75;
+}
+
+
+/* =========================================================
+   PROGRESS LINE
+========================================================= */
+
+.how-step-progress {
+  position:
+    absolute;
+
+  left:
+    28px;
+
+  right:
+    28px;
+
+  bottom:
+    26px;
+
+  height:
+    3px;
+
+  overflow:
+    hidden;
+
+  border-radius:
+    999px;
+
+  background:
+    rgba(255, 255, 255, 0.045);
+}
+
+.how-step-progress span {
+  display:
+    block;
+
+  width:
+    34%;
+
+  height:
+    100%;
+
+  border-radius:
+    inherit;
+
+  background:
+    linear-gradient(
+      90deg,
+      #5f72f2,
+      #9a63eb,
+      #39bfd7
+    );
+
+  animation:
+    howProgressMove
+    4.8s
+    ease-in-out
+    infinite;
+}
+
+@keyframes howProgressMove {
+  0% {
+    transform:
+      translateX(-100%);
+  }
+
+  50% {
+    transform:
+      translateX(180%);
+  }
+
+  100% {
+    transform:
+      translateX(340%);
+  }
+}
+
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.how-step-watermark {
+  position:
+    absolute;
+
+  right:
+    14px;
+
+  bottom:
+    -24px;
+
+  color:
+    rgba(255, 255, 255, 0.025);
+
+  font-size:
+    118px;
+
+  font-weight:
+    850;
+
+  letter-spacing:
+    -8px;
+
+  pointer-events:
+    none;
+
+  user-select:
+    none;
+
+  transition:
+    transform
+    0.7s
+    var(--ease-smooth),
+    color
+    0.7s ease;
+}
+
+.how-step-card:hover
+.how-step-watermark {
+  transform:
+    translateY(-6px);
+
+  color:
+    rgba(116, 105, 238, 0.045);
+}
+
+
+/* =========================================================
+   FLOW SECTION
+========================================================= */
+
+.how-flow {
+  position:
+    relative;
+
+  margin-top:
+    55px;
+
+  padding:
+    24px 28px;
+
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr auto 1fr auto 1fr;
+
+  align-items:
+    center;
+
+  gap:
+    20px;
+
+  overflow:
+    hidden;
+
+  border:
+    1px solid
+    var(--border-subtle);
+
+  border-radius:
+    22px;
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  backdrop-filter:
+    blur(20px);
+
+  -webkit-backdrop-filter:
+    blur(20px);
+
+  box-shadow:
+    var(--shadow-sm);
+}
+
+
+/* =========================================================
+   FLOW LINE
+========================================================= */
+
+.how-flow-line {
+  position:
+    absolute;
+
+  left:
+    0;
+
+  right:
+    0;
+
+  top:
+    0;
+
+  height:
+    1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(111, 110, 245, 0.75),
+      rgba(50, 198, 219, 0.55),
+      transparent
+    );
+
+  animation:
+    flowLineGlow
+    7s
+    ease-in-out
+    infinite;
+}
+
+@keyframes flowLineGlow {
+  0%,
+  100% {
+    opacity:
+      0.4;
+  }
+
+  50% {
+    opacity:
+      0.95;
+  }
+}
+
+
+/* =========================================================
+   FLOW ITEM
+========================================================= */
+
+.how-flow-item {
+  min-width:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    12px;
+}
+
+.flow-number {
+  width:
+    38px;
+
+  height:
+    38px;
+
+  flex-shrink:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  border-radius:
+    11px;
+
+  color:
+    #8e92ff;
+
+  background:
+    rgba(97, 97, 231, 0.1);
+
+  font-size:
+    9px;
+
+  font-weight:
+    850;
+}
+
+.how-flow-item strong,
+.how-flow-item span {
+  display:
+    block;
+}
+
+.how-flow-item strong {
+  color:
+    #dfe7f2;
+
+  font-size:
+    12px;
+}
+
+.how-flow-item div > span {
+  margin-top:
+    3px;
+
+  color:
+    #63748a;
+
+  font-size:
+    9px;
+}
+
+
+/* =========================================================
+   ARROWS
+========================================================= */
+
+.how-flow-arrow {
+  color:
+    #52647c;
+
+  font-size:
+    18px;
+
+  animation:
+    flowArrowMove
+    3s
+    ease-in-out
+    infinite;
+}
+
+@keyframes flowArrowMove {
+  0%,
+  100% {
+    transform:
+      translateX(0);
+
+    opacity:
+      0.45;
+  }
+
+  50% {
+    transform:
+      translateX(4px);
+
+    opacity:
+      0.85;
+  }
+}
+
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.how-note {
+  width:
+    min(
+      720px,
+      100%
+    );
+
+  margin:
+    32px auto 0;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    center;
+
+  gap:
+    10px;
+
+  text-align:
+    center;
+}
+
+.how-note-dot {
+  width:
+    7px;
+
+  height:
+    7px;
+
+  flex-shrink:
+    0;
+
+  margin-top:
+    7px;
+
+  border-radius:
+    50%;
+
+  background:
+    #4dce9a;
+
+  box-shadow:
+    0 0 14px
+    rgba(77, 206, 154, 0.35);
+}
+
+.how-note p {
+  color:
+    #66768b;
+
+  font-size:
+    10px;
+
+  line-height:
+    1.7;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (
+  max-width:
+    950px
+) {
+  .how-steps {
+    grid-template-columns:
+      1fr;
+  }
+
+  .how-step-card {
+    min-height:
+      250px;
+  }
+
+  .how-step-content {
+    margin-top:
+      45px;
+
+    max-width:
+      580px;
+  }
+
+  .how-flow {
+    grid-template-columns:
+      1fr;
+
+    gap:
+      16px;
+  }
+
+  .how-flow-arrow {
+    transform:
+      rotate(90deg);
+
+    justify-self:
+      center;
+
+    animation:
+      none;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (
+  max-width:
+    650px
+) {
+  .how-section {
+    padding:
+      85px 14px;
+  }
+
+  .how-header {
+    margin-bottom:
+      45px;
+  }
+
+  .how-header h2 {
+    letter-spacing:
+      -1.7px;
+  }
+
+  .how-header p {
+    font-size:
+      14px;
+  }
+
+  .how-step-card {
+    min-height:
+      245px;
+
+    padding:
+      22px;
+
+    border-radius:
+      20px;
+  }
+
+  .how-step-content {
+    margin-top:
+      42px;
+  }
+
+  .how-step-content h3 {
+    font-size:
+      19px;
+  }
+
+  .how-step-progress {
+    left:
+      22px;
+
+    right:
+      22px;
+  }
+
+  .how-flow {
+    margin-top:
+      35px;
+
+    padding:
+      20px;
+  }
+
+  .how-flow-item {
+    align-items:
+      flex-start;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (
+  max-width:
+    390px
+) {
+  .how-section {
+    padding:
+      70px 11px;
+  }
+
+  .how-step-card {
+    padding:
+      19px;
+  }
+
+  .how-step-tag {
+    font-size:
+      7px;
+  }
+
+  .how-step-watermark {
+    font-size:
+      95px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (
+  prefers-reduced-motion:
+  reduce
+) {
+  .how-glow,
+  .how-header,
+  .how-step-card,
+  .how-step-progress span,
+  .how-flow-line,
+  .how-flow-arrow {
+    animation:
+      none;
+  }
+}

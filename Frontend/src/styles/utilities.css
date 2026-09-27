@@ -1,0 +1,276 @@
+/* ======================================================
+   CONTAINERS
+====================================================== */
+
+.app-container {
+  width: min(
+    calc(100% - 40px),
+    var(--container)
+  );
+
+  margin-inline: auto;
+}
+
+
+/* ======================================================
+   SECTIONS
+====================================================== */
+
+.section {
+  position: relative;
+
+  padding:
+    var(--section-space)
+    0;
+}
+
+.section-header {
+  width: min(
+    720px,
+    100%
+  );
+
+  margin:
+    0 auto 60px;
+
+  text-align: center;
+}
+
+.section-eyebrow {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 16px;
+
+  padding:
+    7px 11px;
+
+  border:
+    1px solid
+    var(--border-soft);
+
+  border-radius:
+    var(--radius-round);
+
+  color:
+    var(--blue-soft);
+
+  background:
+    rgba(255, 255, 255, 0.025);
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.7px;
+
+  text-transform: uppercase;
+}
+
+.section-title {
+  margin: 0;
+
+  color:
+    var(--text-main);
+
+  font-size:
+    clamp(
+      2rem,
+      4vw,
+      3.35rem
+    );
+
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  letter-spacing: -1.8px;
+}
+
+.section-description {
+  margin-top: 18px;
+
+  color:
+    var(--text-secondary);
+
+  font-size: 16px;
+
+  line-height: 1.8;
+}
+
+
+/* ======================================================
+   GRADIENT TEXT
+====================================================== */
+
+.gradient-text {
+  background:
+    var(--gradient-primary);
+
+  background-clip: text;
+
+  -webkit-background-clip: text;
+
+  color: transparent;
+
+  -webkit-text-fill-color:
+    transparent;
+}
+
+
+/* ======================================================
+   GLASS
+====================================================== */
+
+.glass {
+  border:
+    1px solid
+    var(--border-soft);
+
+  background:
+    rgba(12, 22, 38, 0.72);
+
+  backdrop-filter:
+    blur(22px);
+
+  -webkit-backdrop-filter:
+    blur(22px);
+
+  box-shadow:
+    var(--shadow-sm);
+}
+
+
+/* ======================================================
+   DARK CARD
+====================================================== */
+
+.dark-card {
+  border:
+    1px solid
+    var(--border-subtle);
+
+  border-radius:
+    var(--radius-lg);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(17, 28, 46, 0.9),
+      rgba(9, 17, 30, 0.95)
+    );
+
+  box-shadow:
+    var(--shadow-sm);
+
+  transition:
+    transform var(--transition-normal),
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal);
+}
+
+.dark-card:hover {
+  transform:
+    translateY(-5px);
+
+  border-color:
+    rgba(117, 102, 240, 0.18);
+
+  box-shadow:
+    var(--shadow-md);
+}
+
+
+/* ======================================================
+   BUTTONS
+====================================================== */
+
+.btn {
+  min-height: 48px;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  padding:
+    0 20px;
+
+  border: none;
+
+  border-radius:
+    14px;
+
+  cursor: pointer;
+
+  font-weight: 700;
+
+  transition:
+    transform var(--transition-normal),
+    box-shadow var(--transition-normal),
+    filter var(--transition-normal);
+}
+
+.btn:hover {
+  transform:
+    translateY(-2px);
+}
+
+.btn:active {
+  transform:
+    translateY(0)
+    scale(0.99);
+}
+
+.btn-primary {
+  color: white;
+
+  background:
+    var(--gradient-primary);
+
+  box-shadow:
+    var(--shadow-primary);
+}
+
+.btn-secondary {
+  color:
+    var(--text-main);
+
+  border:
+    1px solid
+    var(--border-soft);
+
+  background:
+    rgba(255, 255, 255, 0.035);
+}
+
+
+/* ======================================================
+   MOBILE
+====================================================== */
+
+@media (max-width: 768px) {
+  .section {
+    padding:
+      var(--section-space-mobile)
+      0;
+  }
+
+  .app-container {
+    width:
+      min(
+        calc(100% - 28px),
+        var(--container)
+      );
+  }
+
+  .section-header {
+    margin-bottom: 42px;
+  }
+}
