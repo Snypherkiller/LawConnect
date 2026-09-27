@@ -1,10 +1,11 @@
+import Navbar from "../../Components/Navbar/Navbar.jsx";
 import TopicCard from "../Topics/TopicCard.jsx";
 import HowItWorks from "../../Components/HowItWorks/HowItWorks.jsx";
 import EmergencyBanner from "../../Components/EmergencyBanner/EmergencyBanner.jsx";
 import Footer from "../../Components/Footer/Footer.jsx";
-import Navbar from "../../Components/Navbar/Navbar.jsx";
 
 import "./Landing.css";
+import Hero from "../../Components/Hero/Hero.jsx";
 
 function Landing() {
   const topics = [
@@ -17,7 +18,6 @@ function Landing() {
       theme: "blue",
       href: "#",
     },
-
     {
       number: "02",
       title: "Driving & Rentals",
@@ -27,7 +27,6 @@ function Landing() {
       theme: "purple",
       href: "#",
     },
-
     {
       number: "03",
       title: "Police & Safety",
@@ -37,7 +36,6 @@ function Landing() {
       theme: "cyan",
       href: "#",
     },
-
     {
       number: "04",
       title: "Scams & Complaints",
@@ -47,7 +45,6 @@ function Landing() {
       theme: "gold",
       href: "#",
     },
-
     {
       number: "05",
       title: "Drones & Restrictions",
@@ -57,7 +54,6 @@ function Landing() {
       theme: "teal",
       href: "#",
     },
-
     {
       number: "06",
       title: "Emergency Guidance",
@@ -71,33 +67,9 @@ function Landing() {
 
   return (
     <div className="landing-page">
-      {/* Temporary hero */}
-      <Navbar/>
+      <Navbar />
 
-      <section className="landing-placeholder">
-        <div className="landing-placeholder-glow landing-glow-one" />
-
-        <div className="landing-placeholder-glow landing-glow-two" />
-
-        <div className="landing-placeholder-content">
-          <span className="landing-status">
-            LAWCONNECT
-          </span>
-
-          <h1>
-            Your everyday
-            <span>
-              legal assistant.
-            </span>
-          </h1>
-
-          <p>
-            Clear legal information for travellers visiting Sri Lanka.
-          </p>
-        </div>
-      </section>
-
-      {/* Popular topics */}
+      <Hero/>
 
       <section
         className="topics-section"
@@ -106,7 +78,6 @@ function Landing() {
         <div className="topics-background-grid" />
 
         <div className="topics-glow topics-glow-one" />
-
         <div className="topics-glow topics-glow-two" />
 
         <div className="topics-container">
@@ -117,9 +88,7 @@ function Landing() {
 
             <h2>
               Help for the situations
-              <span>
-                travellers face.
-              </span>
+              <span> travellers face.</span>
             </h2>
 
             <p>
@@ -150,9 +119,7 @@ function Landing() {
 
             <button>
               Ask LawConnect
-              <span>
-                →
-              </span>
+              <span>→</span>
             </button>
           </div>
         </div>
