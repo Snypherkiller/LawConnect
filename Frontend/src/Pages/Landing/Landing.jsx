@@ -1,13 +1,17 @@
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../Components/Navbar/Navbar.jsx";
 import TopicCard from "../Topics/TopicCard.jsx";
 import HowItWorks from "../../Components/HowItWorks/HowItWorks.jsx";
 import EmergencyBanner from "../../Components/EmergencyBanner/EmergencyBanner.jsx";
 import Footer from "../../Components/Footer/Footer.jsx";
-
-import "./Landing.css";
 import Hero from "../../Components/Hero/Hero.jsx";
 
+import "./Landing.css";
+
 function Landing() {
+  const navigate = useNavigate();
+
   const topics = [
     {
       number: "01",
@@ -69,14 +73,10 @@ function Landing() {
     <div className="landing-page">
       <Navbar />
 
-      <Hero/>
+      <Hero />
 
-      <section
-        className="topics-section"
-        id="topics"
-      >
+      <section className="topics-section" id="topics">
         <div className="topics-background-grid" />
-
         <div className="topics-glow topics-glow-one" />
         <div className="topics-glow topics-glow-two" />
 
@@ -113,11 +113,9 @@ function Landing() {
           </div>
 
           <div className="topics-bottom">
-            <p>
-              Can't find what you're looking for?
-            </p>
+            <p>Can't find what you're looking for?</p>
 
-            <button>
+            <button onClick={() => navigate("/ask")}>
               Ask LawConnect
               <span>→</span>
             </button>
