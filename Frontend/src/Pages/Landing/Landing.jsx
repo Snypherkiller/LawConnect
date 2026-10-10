@@ -1,3 +1,6 @@
+
+import { useNavigate } from "react-router-dom";
+
 import Navbar from "../../Components/Navbar/Navbar.jsx";
 import TopicCard from "../Topics/TopicCard.jsx";
 import HowItWorks from "../../Components/HowItWorks/HowItWorks.jsx";
@@ -8,6 +11,8 @@ import "./Landing.css";
 import Hero from "../../Components/Hero/Hero.jsx";
 
 function Landing() {
+  const navigate = useNavigate();
+
   const topics = [
     {
       number: "01",
@@ -69,7 +74,7 @@ function Landing() {
     <div className="landing-page">
       <Navbar />
 
-      <Hero/>
+      <Hero />
 
       <section
         className="topics-section"
@@ -118,9 +123,9 @@ function Landing() {
             </p>
 
             <button onClick={() => navigate("/ask")}>
-  Ask LawConnect
-  <span>→</span>
-</button>
+              Ask LawConnect
+              <span>→</span>
+            </button>
           </div>
         </div>
       </section>
