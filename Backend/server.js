@@ -1,81 +1,67 @@
 
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import rateLimit from "express-rate-limit";
-import { GoogleGenAI } from "@google/genai";
-
-dotenv.config();
+const express = require("express");
+const cors = require("cors");
+const { GoogleGenAI } = require("@google/genai");
 
 const app = express();
 
 app.disable("x-powered-by");
-app.set("trust proxy", 1);
 
 const allowedOrigins = (
   process.env.FRONTEND_ORIGINS ||
   "http://localhost:5173,https://snypherkiller.github.io"
 )
   .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
+  .map((origin) => origin.trim());
 
 app.use(
   cors({
-    origin(origin, callback) {
+    origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Origin not allowed by CORS"));
+      callback(new Error("Not allowed by CORS"));
     },
-    methods: ["GET", "POST"],
-    allowedHeaders: ["Content-Type"],
   })
 );
 
 app.use(express.json({ limit: "100kb" }));
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 20,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  message: {
-    error: "Too many requests. Please try again later.",
-  },
-});
-
-app.use("/api/chat", limiter);
-
 const SYSTEM_PROMPT = `
-You are LawConnect AI, a helpful legal information assistant
-for tourists visiting Sri Lanka.
+You are LawConnect AI, an assistant that provides
+general legal information for tourists in Sri Lanka.
 
-Your responsibilities:
-- Explain general Sri Lankan legal information in simple English.
-- Help visitors understand visa rules, driving regulations,
-  vehicle rentals, police procedures, and tourist safety.
-- Provide practical guidance and clear explanations.
-- Be polite, professional, and easy to understand.
-- Clearly distinguish general information from legal advice.
-- Do not invent laws, penalties, government requirements,
-  official citations, or legal procedures.
-- Do not claim that information has been officially verified
-  unless an actual verification process has occurred.
-- When uncertain, explain the uncertainty and recommend
-  checking the relevant Sri Lankan government authority.
-- For emergencies, recommend contacting the appropriate
-  local emergency services.
-- Never pretend to be a lawyer.
+Explain Sri Lankan tourist-related laws and procedures
+in clear, simple English.
 
-Use readable paragraphs and short lists when useful.
+You can help with:
+- Tourist visas and immigration
+- Driving licences and vehicle rentals
+- Police interactions and tourist safety
+- Consumer rights and common tourist legal questions
+
+Important rules:
+- Provide general information, not professional legal advice.
+- Never invent laws, penalties, citations or regulations.
+- Explain uncertainty when information may be outdated.
+- Recommend official Sri Lankan government sources
+  when verification is needed.
+- Do not claim you have checked current laws unless
+  you have actually verified them.
+- Be friendly, concise and professional.
 `;
 
 app.get("/", (req, res) => {
   res.json({
     name: "LawConnect API",
     status: "running",
+  });
+});
+
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Hello from the LawConnect Backend!",
   });
 });
 
@@ -121,36 +107,24 @@ app.post("/api/chat", async (req, res) => {
       });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      console.error("GEMINI_API_KEY is missing");
-
+    if (!process.env.GEMINI_API_KEY) {
       return res.status(503).json({
-        error: "AI service is not configured.",
+        error: "Gemini API key is not configured.",
       });
     }
 
     const ai = new GoogleGenAI({
-      apiKey,
+      apiKey: process.env.GEMINI_API_KEY,
     });
 
-    // Exclude the frontend's static welcome message.
     const conversation = messages.filter(
       (message, index) =>
-        !(
-          index === 0 &&
-          message.role === "assistant"
-        )
+        !(index === 0 && message.role === "assistant")
     );
 
     const contents = conversation.map((message) => ({
       role: message.role === "assistant" ? "model" : "user",
-      parts: [
-        {
-          text: message.content.trim(),
-        },
-      ],
+      parts: [{ text: message.content.trim() }],
     }));
 
     const response = await ai.models.generateContent({
@@ -167,38 +141,32 @@ app.post("/api/chat", async (req, res) => {
 
     if (!reply) {
       return res.status(502).json({
-        error: "The AI returned an empty response.",
+        error: "Gemini returned an empty response.",
       });
     }
 
-    return res.json({
-      reply,
-    });
+    return res.json({ reply });
   } catch (error) {
-    console.error("Gemini API error:", error);
+    console.error("Gemini request failed:", error);
 
-    const status = error?.status || error?.code;
-
-    if (status === 429 || status === "429") {
+    if (Number(error?.status) === 429) {
       return res.status(429).json({
         error: "AI service is busy. Please try again later.",
       });
     }
 
     return res.status(500).json({
-      error: "Unable to generate a response right now.",
+      error: "Unable to generate an AI response.",
     });
   }
 });
 
-// Local development only.
-// Vercel imports the exported Express app.
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+module.exports = app;
+
+if (require.main === module) {
   const PORT = process.env.PORT || 5000;
 
   app.listen(PORT, () => {
     console.log(`LawConnect API running on port ${PORT}`);
   });
 }
-
-export default app;
