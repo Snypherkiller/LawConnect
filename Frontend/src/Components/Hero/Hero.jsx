@@ -1,8 +1,11 @@
+
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Hero.css";
 
 export default function Hero() {
   const [question, setQuestion] = useState("");
+  const navigate = useNavigate();
 
   const suggestions = [
     "Can I drive in Sri Lanka with my foreign licence?",
@@ -10,16 +13,26 @@ export default function Hero() {
     "Can tourists fly drones in Sri Lanka?",
   ];
 
+  const askLawConnect = (text) => {
+    const finalQuestion = text.trim();
+
+    if (!finalQuestion) return;
+
+    navigate("/ask", {
+      state: {
+        initialQuestion: finalQuestion,
+      },
+    });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    if (!question.trim()) return;
-
-    console.log("Question:", question);
+    askLawConnect(question);
   };
 
   const useSuggestion = (text) => {
     setQuestion(text);
+    askLawConnect(text);
   };
 
   return (

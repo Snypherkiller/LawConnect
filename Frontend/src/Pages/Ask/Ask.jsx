@@ -1,429 +1,420 @@
 
-import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import {
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
 import Navbar from "../../Components/Navbar/Navbar.jsx";
 import Footer from "../../Components/Footer/Footer.jsx";
+
 import "./Ask.css";
 
-const suggestions = [
-  {
-    number: "01",
-    category: "DRIVING",
-    question: "Can I drive in Sri Lanka with my foreign licence?",
-  },
-  {
-    number: "02",
-    category: "TRAVEL",
-    question: "What should I do if I lose my passport?",
-  },
-  {
-    number: "03",
-    category: "SAFETY",
-    question: "What should I do after a road accident?",
-  },
-  {
-    number: "04",
-    category: "REGULATIONS",
-    question: "Are tourists allowed to fly drones?",
-  },
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+const welcomeMessage = {
+  role: "assistant",
+  content:
+    "Hello! I'm LawConnect AI. I can help you understand general legal and regulatory information about travelling in Sri Lanka. What would you like to know?",
+};
+
+const suggestedQuestions = [
+  "Can I drive in Sri Lanka with my foreign licence?",
+  "How can I extend my tourist visa?",
+  "What should I do if my passport is lost?",
+  "How do I report a tourist scam?",
 ];
 
-const createWelcomeMessage = () => ({
-  id: "welcome",
-  role: "assistant",
-  text: "Welcome to LawConnect. Describe your situation or choose a suggested question. I'll help you understand what information you need and what steps to consider.",
-  demo: false,
-});
+function Ask() {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-function createDemoAnswer(question) {
-  return {
-    id: `answer-${Date.now()}`,
-    role: "assistant",
-    text: "Your question has been received. The legal information service has not been connected yet, so I cannot provide a verified answer to this specific situation.",
-    question,
-    demo: true,
-    steps: [
-      "Identify the relevant legal or regulatory topic.",
-      "Check the applicable official Sri Lankan source.",
-      "Confirm that the information is current and applies to your situation.",
-      "Follow the authority's instructions or seek qualified legal advice when necessary.",
-    ],
-    source: {
-      authority: "Not yet retrieved",
-      status: "Demo mode — no legal source verified",
-    },
-  };
-}
-
-export default function Ask() {
   const [messages, setMessages] = useState([
-    createWelcomeMessage(),
+    welcomeMessage,
   ]);
-  const [question, setQuestion] = useState("");
-  const [isThinking, setIsThinking] = useState(false);
-  const [selectedSource, setSelectedSource] = useState(null);
-  const [showMobileSources, setShowMobileSources] = useState(false);
 
-  const messagesEndRef = useRef(null);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const chatContainerRef = useRef(null);
   const textareaRef = useRef(null);
-  const timerRef = useRef(null);
+  const sendingRef = useRef(false);
+  const messagesRef = useRef([welcomeMessage]);
+  const initialHandledRef = useRef(false);
 
+  // Scroll ONLY the chat messages container.
+  // This prevents the entire website from scrolling.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
+    const container = chatContainerRef.current;
+
+    if (!container) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
       behavior: "smooth",
-      block: "end",
     });
-  }, [messages, isThinking]);
+  }, [messages, loading]);
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-      }
-    };
-  }, []);
+  const sendMessage = useCallback(async (text) => {
+    const question = String(text || "").trim();
 
-  function submitQuestion(value = question) {
-    const cleanQuestion = value.trim();
-
-    if (!cleanQuestion || isThinking) return;
-
-    const userMessage = {
-      id: `question-${Date.now()}`,
-      role: "user",
-      text: cleanQuestion,
-    };
-
-    setMessages((current) => [...current, userMessage]);
-    setQuestion("");
-    setIsThinking(true);
-    setSelectedSource(null);
-
-    timerRef.current = setTimeout(() => {
-      const answer = createDemoAnswer(cleanQuestion);
-
-      setMessages((current) => [...current, answer]);
-      setSelectedSource(answer.source);
-      setIsThinking(false);
-    }, 800);
-
-    textareaRef.current?.focus();
-  }
-
-  function handleSubmit(event) {
-    event.preventDefault();
-    submitQuestion();
-  }
-
-  function clearConversation() {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
+    if (!question || sendingRef.current) {
+      return;
     }
 
-    setMessages([createWelcomeMessage()]);
-    setQuestion("");
-    setIsThinking(false);
-    setSelectedSource(null);
-    setShowMobileSources(false);
-  }
+    sendingRef.current = true;
+
+    const userMessage = {
+      role: "user",
+      content: question,
+    };
+
+    const updatedMessages = [
+      ...messagesRef.current,
+      userMessage,
+    ];
+
+    messagesRef.current = updatedMessages;
+
+    setMessages(updatedMessages);
+    setInput("");
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: updatedMessages.slice(-30),
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ||
+          "Unable to generate a response."
+        );
+      }
+
+      const assistantMessage = {
+        role: "assistant",
+        content:
+          data.reply ||
+          "Sorry, I couldn't generate an answer.",
+      };
+
+      const nextMessages = [
+        ...messagesRef.current,
+        assistantMessage,
+      ];
+
+      messagesRef.current = nextMessages;
+
+      setMessages(nextMessages);
+    } catch (err) {
+      setError(
+        err.message ||
+        "Unable to connect to LawConnect AI."
+      );
+    } finally {
+      sendingRef.current = false;
+      setLoading(false);
+
+      // Prevent focus from scrolling the entire page.
+      textareaRef.current?.focus({
+        preventScroll: true,
+      });
+    }
+  }, []);
+
+  // Automatically send the question received
+  // from the Landing page Hero section.
+  useEffect(() => {
+    const initialQuestion =
+      location.state?.initialQuestion;
+
+    if (
+      !initialQuestion ||
+      initialHandledRef.current
+    ) {
+      return;
+    }
+
+    initialHandledRef.current = true;
+
+    navigate(location.pathname, {
+      replace: true,
+      state: null,
+    });
+
+    sendMessage(initialQuestion);
+  }, [
+    location.state,
+    location.pathname,
+    navigate,
+    sendMessage,
+  ]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    sendMessage(input);
+  };
+
+  const handleKeyDown = (event) => {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing
+    ) {
+      event.preventDefault();
+      sendMessage(input);
+    }
+  };
+
+  const clearChat = () => {
+    if (sendingRef.current) {
+      return;
+    }
+
+    messagesRef.current = [welcomeMessage];
+
+    setMessages([welcomeMessage]);
+    setInput("");
+    setError("");
+
+    textareaRef.current?.focus({
+      preventScroll: true,
+    });
+  };
 
   return (
     <div className="ask-page">
       <Navbar />
 
-      <main className="ask-main">
-        <div className="ask-grid-background" aria-hidden="true" />
-        <div className="ask-orb ask-orb-one" aria-hidden="true" />
-        <div className="ask-orb ask-orb-two" aria-hidden="true" />
+      <main className="ai-main">
+        <div className="ai-background-glow ai-glow-one" />
+        <div className="ai-background-glow ai-glow-two" />
 
-        <div className="ask-container">
-          <header className="ask-heading">
-            <div className="ask-heading-copy">
-              <span className="ask-eyebrow">
-                YOUR EVERYDAY LEGAL ASSISTANT
-              </span>
+        <div className="ai-container">
+          <div className="ai-heading">
+            <span className="ai-eyebrow">
+              YOUR LEGAL AI ASSISTANT
+            </span>
 
-              <h1>
-                Understand the rules.
-                <span>Know your next step.</span>
-              </h1>
+            <h1>
+              Ask anything.
+              <span> Understand your rights.</span>
+            </h1>
 
-              <p>
-                Ask everyday legal and regulatory questions about travelling
-                in Sri Lanka. Get clear explanations and source information
-                when the legal service is connected.
-              </p>
-            </div>
+            <p>
+              Get clear, conversational guidance about
+              common legal and regulatory questions while
+              visiting Sri Lanka.
+            </p>
+          </div>
 
-            <div className="ask-ready-card">
-              <span className="ask-ready-dot" />
-              <div>
-                <strong>Ask LawConnect</strong>
-                <span>Traveller-focused guidance</span>
+          <div className="ai-workspace">
+            <aside className="ai-sidebar">
+              <div className="ai-sidebar-heading">
+                <h2>Explore questions</h2>
+                <p>Not sure where to begin?</p>
               </div>
-            </div>
-          </header>
 
-          <div className="ask-workspace">
-            <aside className="ask-sidebar">
-              <section className="ask-side-card">
-                <div className="ask-side-title">
-                  <span>TRY A QUESTION</span>
-                  <span>04</span>
-                </div>
-
-                <div className="ask-suggestions">
-                  {suggestions.map((item) => (
+              <div className="ai-suggestions">
+                {suggestedQuestions.map(
+                  (question, index) => (
                     <button
+                      key={question}
                       type="button"
-                      key={item.number}
-                      className="ask-suggestion"
-                      onClick={() => {
-                        setQuestion(item.question);
-                        textareaRef.current?.focus();
-                      }}
+                      className="ai-suggestion"
+                      onClick={() =>
+                        sendMessage(question)
+                      }
+                      disabled={loading}
                     >
-                      <span className="ask-suggestion-number">
-                        {item.number}
+                      <span className="ai-suggestion-number">
+                        {String(index + 1).padStart(
+                          2,
+                          "0"
+                        )}
                       </span>
-                      <span className="ask-suggestion-content">
-                        <small>{item.category}</small>
-                        <span>{item.question}</span>
-                      </span>
+
+                      <span>{question}</span>
                     </button>
-                  ))}
-                </div>
-              </section>
+                  )
+                )}
+              </div>
 
-              <section className="ask-side-card ask-topic-card">
-                <div className="ask-side-title">
-                  <span>EXPLORE TOPICS</span>
-                </div>
+              <div className="ai-sidebar-notice">
+                <strong>
+                  Important information
+                </strong>
 
-                <Link to="/topics">Visa & Immigration</Link>
-                <Link to="/topics">Driving & Rentals</Link>
-                <Link to="/topics">Police & Safety</Link>
-                <Link to="/topics">Scams & Complaints</Link>
-                <Link to="/topics">Drones & Restrictions</Link>
-
-                <p className="ask-coming-soon">
-                  Topic pages are being built.
-                </p>
-              </section>
-
-              <section className="ask-emergency-card">
-                <span className="ask-emergency-label">
-                  NEED URGENT HELP?
-                </span>
-                <h2>Safety comes first.</h2>
                 <p>
-                  For immediate danger, contact the relevant emergency
-                  service instead of waiting for an online response.
+                  LawConnect provides general legal
+                  information, not professional legal
+                  advice. Verify important requirements
+                  with official authorities.
                 </p>
-                <Link to="/emergency">
-                  Emergency information <span>→</span>
-                </Link>
-              </section>
+              </div>
             </aside>
 
-            <section className="ask-chat">
-              <div className="ask-chat-header">
-                <div className="ask-chat-brand">
-                  <div className="ask-mini-logo">LC</div>
+            <section className="ai-chat">
+              <div className="ai-chat-header">
+                <div className="ai-brand">
+                  <div className="ai-brand-avatar">
+                    LC
+                  </div>
+
                   <div>
-                    <strong>LawConnect Assistant</strong>
-                    <span>Legal information workspace</span>
+                    <strong>
+                      LawConnect AI
+                    </strong>
+
+                    <span>
+                      Legal information assistant
+                    </span>
                   </div>
                 </div>
 
-                <div className="ask-chat-actions">
-                  <button
-                    type="button"
-                    className="ask-source-toggle"
-                    onClick={() => setShowMobileSources((value) => !value)}
-                  >
-                    Sources
-                  </button>
-                  <button
-                    type="button"
-                    className="ask-clear-button"
-                    onClick={clearConversation}
-                  >
-                    New chat
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="ai-clear-button"
+                  onClick={clearChat}
+                  disabled={loading}
+                >
+                  New chat
+                </button>
               </div>
 
-              <div className="ask-messages" aria-live="polite">
-                {messages.map((message) => (
-                  <article
-                    key={message.id}
-                    className={`ask-message ask-message-${message.role}`}
-                  >
-                    <div className="ask-message-label">
-                      <span>
-                        {message.role === "user" ? "YOU" : "LAWCONNECT"}
-                      </span>
-                      <span>
-                        {message.role === "user" ? "Your question" : "Assistant"}
-                      </span>
-                    </div>
-
-                    <div className="ask-bubble">
-                      <p>{message.text}</p>
-
-                      {message.demo && (
-                        <>
-                          <div className="ask-demo-notice">
-                            <strong>Demo response</strong>
-                            <span>
-                              No legal source has been checked for this
-                              answer. Do not rely on it as legal advice.
-                            </span>
-                          </div>
-
-                          <div className="ask-steps">
-                            <h3>What the connected service should check</h3>
-
-                            {message.steps.map((step, index) => (
-                              <div className="ask-step" key={step}>
-                                <span>
-                                  {String(index + 1).padStart(2, "0")}
-                                </span>
-                                <p>{step}</p>
-                              </div>
-                            ))}
-                          </div>
-
-                          <button
-                            type="button"
-                            className="ask-view-source"
-                            onClick={() => {
-                              setSelectedSource(message.source);
-                              setShowMobileSources(true);
-                            }}
-                          >
-                            View source status <span>→</span>
-                          </button>
-                        </>
+              <div
+                className="ai-messages"
+                ref={chatContainerRef}
+                role="log"
+                aria-label="Chat messages"
+                aria-live="polite"
+              >
+                {messages.map(
+                  (message, index) => (
+                    <div
+                      key={index}
+                      className={`ai-message ${
+                        message.role === "user"
+                          ? "ai-message-user"
+                          : "ai-message-assistant"
+                      }`}
+                    >
+                      {message.role ===
+                        "assistant" && (
+                        <div className="ai-message-avatar">
+                          LC
+                        </div>
                       )}
-                    </div>
-                  </article>
-                ))}
 
-                {isThinking && (
-                  <div className="ask-thinking">
-                    <span className="ask-thinking-dot" />
-                    <span className="ask-thinking-dot" />
-                    <span className="ask-thinking-dot" />
-                    <p>Preparing a demo response…</p>
+                      <div className="ai-message-body">
+                        <span className="ai-message-author">
+                          {message.role ===
+                          "assistant"
+                            ? "LawConnect AI"
+                            : "You"}
+                        </span>
+
+                        <div className="ai-message-bubble">
+                          {message.content}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                )}
+
+                {loading && (
+                  <div className="ai-message ai-message-assistant">
+                    <div className="ai-message-avatar">
+                      LC
+                    </div>
+
+                    <div className="ai-message-body">
+                      <span className="ai-message-author">
+                        LawConnect AI
+                      </span>
+
+                      <div className="ai-typing">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <form
+                className="ai-chat-bottom"
+                onSubmit={handleSubmit}
+              >
+                {error && (
+                  <div
+                    className="ai-error"
+                    role="alert"
+                  >
+                    {error}
                   </div>
                 )}
 
-                <div ref={messagesEndRef} />
-              </div>
-
-              <div className="ask-composer-wrap">
-                <form className="ask-composer" onSubmit={handleSubmit}>
-                  <label htmlFor="ask-question">
-                    YOUR QUESTION
-                    <span>Be as specific as you can</span>
-                  </label>
-
+                <div className="ai-input-box">
                   <textarea
-                    id="ask-question"
                     ref={textareaRef}
-                    value={question}
-                    onChange={(event) => setQuestion(event.target.value)}
-                    placeholder="Describe your situation in simple words..."
+                    value={input}
+                    onChange={(event) =>
+                      setInput(
+                        event.target.value
+                      )
+                    }
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask your legal question..."
                     rows={2}
-                    maxLength={2000}
-                    disabled={isThinking}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === "Enter" &&
-                        !event.shiftKey &&
-                        !event.nativeEvent.isComposing
-                      ) {
-                        event.preventDefault();
-                        submitQuestion();
-                      }
-                    }}
+                    maxLength={4000}
+                    disabled={loading}
+                    aria-label="Your message"
                   />
 
-                  <div className="ask-composer-bottom">
-                    <span>Enter to send · Shift + Enter for a new line</span>
-                    <button
-                      type="submit"
-                      disabled={!question.trim() || isThinking}
-                    >
-                      <span>Send question</span>
-                      <strong>→</strong>
-                    </button>
-                  </div>
-                </form>
+                  <button
+                    type="submit"
+                    className="ai-send-button"
+                    disabled={
+                      !input.trim() || loading
+                    }
+                  >
+                    {loading
+                      ? "Thinking..."
+                      : "Send"}
+                  </button>
+                </div>
 
-                <p className="ask-disclaimer">
-                  General information only. Not a substitute for qualified
-                  legal advice. Demo mode does not verify laws or sources.
+                <p className="ai-input-disclaimer">
+                  AI responses may contain mistakes.
+                  Verify legal information with official
+                  Sri Lankan sources.
                 </p>
-              </div>
+              </form>
             </section>
-
-            <aside
-              className={`ask-source-panel ${
-                showMobileSources ? "ask-source-panel-open" : ""
-              }`}
-            >
-              <div className="ask-source-panel-header">
-                <span>SOURCE TRANSPARENCY</span>
-                <h2>Source details</h2>
-                <p>
-                  A trustworthy answer should show where its information
-                  comes from.
-                </p>
-              </div>
-
-              {selectedSource ? (
-                <div className="ask-source-details">
-                  <span className="ask-source-status-label">
-                    NOT VERIFIED
-                  </span>
-
-                  <div>
-                    <small>AUTHORITY</small>
-                    <strong>{selectedSource.authority}</strong>
-                  </div>
-
-                  <div>
-                    <small>VERIFICATION STATUS</small>
-                    <strong>{selectedSource.status}</strong>
-                  </div>
-                </div>
-              ) : (
-                <div className="ask-source-empty">
-                  <span className="ask-source-index">00</span>
-                  <strong>No source selected</strong>
-                  <p>
-                    Source details will appear here when a response includes
-                    source information.
-                  </p>
-                </div>
-              )}
-
-              <div className="ask-source-principle">
-                <span>OUR STANDARD</span>
-                <p>
-                  Legal guidance should identify the relevant authority,
-                  link to its source, and state when the information was
-                  checked.
-                </p>
-              </div>
-
-              <Link to="/sources" className="ask-source-link">
-                About our sources <span>→</span>
-              </Link>
-            </aside>
           </div>
         </div>
       </main>
@@ -432,3 +423,5 @@ export default function Ask() {
     </div>
   );
 }
+
+export default Ask;
